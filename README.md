@@ -4,7 +4,7 @@ A dockerized scrapper hacked from [Horseman.js](http://www.horsemanjs.org/) and 
 ## Usage
 ```sh
 docker build -t scrapper-v2 .
-docker run -p 3000:3000 scrapper-v2 node app.js
+docker run -d -p 3000:3000 scrapper-v2 node app.js
 curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{
 	"open": "http://nz.indeed.com/",
 	"actions": [{

@@ -1,0 +1,41 @@
+stages:
+- build
+- deploy
+- cleanup
+
+before_script:
+  - PROJECT=${PWD##*/}
+  # DOCKER_REPO can alternatively be setup @ gitlab variables
+  - DOCKER_REPO="haphaxrd.io:5000"
+  - echo $PROJECT
+  - echo $CI_BUILD_ID
+  - echo $CI_BUILD_TAG
+  - source ./build/common.sh
+
+build_job:
+  only:
+    - tags
+  tags:
+    - docker
+  stage: build
+  script:
+    - k::build
+
+deploy_job:
+  only:
+    - tags
+  tags:
+    - kubectl
+  stage: deploy
+  script:
+    -  k::upgrade
+
+cleanup_job:
+  only:
+    - tags
+  tags:
+    - kubectl
+  stage: cleanup
+  when: on_failure
+  script:
+    -  k::delete

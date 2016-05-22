@@ -21,7 +21,7 @@ routes.push({
             'hapi-swagger': {
                 responses: {
                     '200': { description: 'Success', schema: Joi.object({
-                        result: SCHEMAS.BasicResult.label('Response')
+                        results: SCHEMAS.BasicResult.label('Response')
                     }).label('Response') },
                     '400': { description: 'Bad Request', schema: SCHEMAS.Error }
                 },

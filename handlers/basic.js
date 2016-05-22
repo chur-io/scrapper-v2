@@ -11,18 +11,32 @@ const Handlers = {};
 // Lib contains our business specific logic
 const Lib = {};
 
+Lib.horsemanOptions = function () {
+
+    const options = {};
+    if (process.env.SCRAPPER_PROXY) {
+        options.proxy = process.env.SCRAPPER_PROXY;
+        options.proxyType = process.env.SCRAPPER_PROXYTYPE || 'http';
+        options.proxyAuth = process.env.SCRAPPER_PROXYAUTH;
+    }
+    if (process.env.SCRAPPER_PHANTOMPATH) {
+        options.phantomPath = process.env.SCRAPPER_PHANTOMPATH;
+    }
+    return options;
+};
+
 Lib.processHorseman = function (url, actions, results) {
 
     return new Promise((resolve, reject) => {
 
-        const horseman = new Horseman();
+        const horseman = new Horseman(Lib.horsemanOptions());
 
         Co(function* () {
 
             yield horseman.open(url);
 
             let i = 0;
-            while (i < actions.length) {
+            while (actions && i < actions.length) {
                 switch (actions[i].type) {
                     case 'click':
                         yield horseman.click(actions[i].selector);
@@ -38,7 +52,7 @@ Lib.processHorseman = function (url, actions, results) {
             }
 
             let j = 0;
-            while (j < results.length) {
+            while (results && j < results.length) {
                 switch (results[j].type) {
                     case 'text':
                         results[j].result = yield horseman.text(results[j].selector);
@@ -49,7 +63,9 @@ Lib.processHorseman = function (url, actions, results) {
                 };
                 j++;
             }
+
             yield horseman.close();
+
             resolve(results);
         });
     });
@@ -60,9 +76,9 @@ Lib.processHorseman = function (url, actions, results) {
 Handlers.basic = function basic(req, reply) {
 
     // call business function
-    Lib.processHorseman(req.payload.open, req.payload.actions, req.payload.results).done((products) => {
+    Lib.processHorseman(req.payload.open, req.payload.actions, req.payload.results).done((results) => {
         // api success
-        reply({ result: products }).code(200);
+        reply({ results }).code(200);
     }, (err) => {
         // api error
         reply(err).code(400);

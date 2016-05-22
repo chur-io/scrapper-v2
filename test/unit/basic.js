@@ -39,4 +39,39 @@ describe('unit tests - basic lib', { timeout: 10000 }, () => {
             done(err);
         });
     });
+
+    it('should return empty options with undefined if not set', (done) => {
+
+        // test lib function
+        const options = BasicHandlers.lib.horsemanOptions();
+
+        expect(options).to.exist();
+
+        done();
+    });
+
+    it('should return proxy options with undefined if SCRAPPER_PROXY is set', (done) => {
+
+        process.env.SCRAPPER_PROXY = '127.0.0.1:8080';
+
+        const options = BasicHandlers.lib.horsemanOptions();
+
+        expect(options).to.exist();
+        expect(options.proxy).to.equal(process.env.SCRAPPER_PROXY);
+        expect(options.proxyType).to.equal('http');
+
+        done();
+    });
+
+    it('should return phantomPath options with undefined if SCRAPPER_PHANTOMPATH is set', (done) => {
+
+        process.env.SCRAPPER_PHANTOMPATH = '/app/node_modules/phantomjs-prebuilt/bin/phantomjs';
+
+        const options = BasicHandlers.lib.horsemanOptions();
+
+        expect(options).to.exist();
+        expect(options.phantomPath).to.equal(process.env.SCRAPPER_PHANTOMPATH);
+
+        done();
+    });
 });
